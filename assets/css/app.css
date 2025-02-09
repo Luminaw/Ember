@@ -1,5 +1,19 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "@unocss/reset/tailwind.css";
+@unocss all;
 
-/* This file is for your main application CSS */
+:root {
+  --color-primary: #2196f3;
+  --color-secondary: #64b5f6;
+  --color-accent: #82b1ff;
+  --color-text: #ffffff;
+  --color-text-muted: #b0bec5;
+  --color-background: #121212;
+  --color-surface: #1e1e1e;
+  --color-border: #2c2c2c;
+}
+
+/* Only keep custom styles that can't be handled by UnoCSS */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
