@@ -13,14 +13,15 @@ defmodule Ember.Generator do
 
   def generate_blog(content_dir, output_dir, template_path \\ "../../templates/index.html") do
     with :ok <- ensure_directory(output_dir),
-         {:ok, abs_content_dir} <- ensure_safe_path(File.cwd!(), content_dir) do
+         {:ok, abs_content_dir} <- ensure_safe_path(File.cwd!(), content_dir),
+         {:ok, template} <- read_template(template_path) do  # Read template once
+
       File.ls!(abs_content_dir)
       |> Enum.filter(&String.ends_with?(&1, ".md"))
-      |> Enum.map(fn filename ->
-        # Sanitize filename to prevent directory traversal
+      |> Task.async_stream(fn filename ->  # Parallel processing
         safe_filename = Path.basename(filename)
         filepath = Path.join(abs_content_dir, safe_filename)
-        with {:ok, html} <- render_content(filepath, template_path),
+        with {:ok, html} <- render_content(filepath, template),  # Pass template instead of path
              output_filename = String.replace(filename, ".md", ".html"),
              output_path = Path.join(output_dir, output_filename),
              :ok <- File.write(output_path, html) do
@@ -28,7 +29,8 @@ defmodule Ember.Generator do
         else
           {:error, reason} -> {:error, filename, reason}
         end
-      end)
+      end, max_concurrency: 4)  # Limit concurrent tasks
+      |> Enum.to_list()
     end
   end
 
@@ -42,11 +44,10 @@ defmodule Ember.Generator do
     end
   end
 
-  defp render_content(filepath, template_path) do
+  defp render_content(filepath, template) do  # Modified to accept template
     with {:ok, content} <- read_file(filepath),
          {:ok, processed_content} <- process_eex(content, filepath),
-         {:ok, html_content} <- markdown_to_html(processed_content, filepath),
-         {:ok, template} <- read_template(template_path) do
+         {:ok, html_content} <- markdown_to_html(processed_content, filepath) do
       {:ok, String.replace(template, "<div id=\"content\"></div>", html_content)}
     end
   end
