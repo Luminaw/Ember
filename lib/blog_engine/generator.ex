@@ -1,12 +1,25 @@
 defmodule Ember.Generator do
   alias Ember.Generator.Error
 
+  # Add this function to sanitize paths
+  defp ensure_safe_path(base_dir, path) do
+    full_path = Path.expand(path, base_dir)
+    if String.starts_with?(full_path, base_dir) do
+      {:ok, full_path}
+    else
+      {:error, Error.new("Path traversal detected", :invalid_path, path)}
+    end
+  end
+
   def generate_blog(content_dir, output_dir, template_path \\ "../../templates/index.html") do
-    with :ok <- ensure_directory(output_dir) do
-      File.ls!(content_dir)
+    with :ok <- ensure_directory(output_dir),
+         {:ok, abs_content_dir} <- ensure_safe_path(File.cwd!(), content_dir) do
+      File.ls!(abs_content_dir)
       |> Enum.filter(&String.ends_with?(&1, ".md"))
       |> Enum.map(fn filename ->
-        filepath = Path.join(content_dir, filename)
+        # Sanitize filename to prevent directory traversal
+        safe_filename = Path.basename(filename)
+        filepath = Path.join(abs_content_dir, safe_filename)
         with {:ok, html} <- render_content(filepath, template_path),
              output_filename = String.replace(filename, ".md", ".html"),
              output_path = Path.join(output_dir, output_filename),
@@ -21,11 +34,10 @@ defmodule Ember.Generator do
 
   def render_markdown(filepath) do
     posts_dir = Application.app_dir(:ember, "priv")
-    full_path = Path.join(posts_dir, filepath)
-
-    with {:ok, content} <- read_file(full_path),
-         {:ok, processed_content} <- process_eex(content, full_path),
-         {:ok, html_content} <- markdown_to_html(processed_content, full_path) do
+    with {:ok, safe_path} <- ensure_safe_path(posts_dir, filepath),
+         {:ok, content} <- read_file(safe_path),
+         {:ok, processed_content} <- process_eex(content, safe_path),
+         {:ok, html_content} <- markdown_to_html(processed_content, safe_path) do
       {:ok, html_content}
     end
   end
@@ -48,11 +60,12 @@ defmodule Ember.Generator do
   end
 
   defp read_template(template_path) do
-    path = Path.join(__DIR__, template_path)
-    case File.read(path) do
-      {:ok, template} -> {:ok, template}
-      {:error, reason} ->
-        {:error, Error.new("Failed to read template", reason, path)}
+    with {:ok, safe_path} <- ensure_safe_path(__DIR__, template_path) do
+      case File.read(safe_path) do
+        {:ok, template} -> {:ok, template}
+        {:error, reason} ->
+          {:error, Error.new("Failed to read template", reason, safe_path)}
+      end
     end
   end
 

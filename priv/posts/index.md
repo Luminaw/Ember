@@ -1,6 +1,6 @@
 # Welcome!
 
-Current time is: <% DateTime.utc_now()  %>
+Current time is: <%= DateTime.utc_now() %>
 
 Welcome to Ember!
 
