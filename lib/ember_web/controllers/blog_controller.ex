@@ -2,7 +2,7 @@ defmodule EmberWeb.BlogController do
   use EmberWeb, :controller
   alias Ember.Generator
 
-  def index(conn, params) do
+  def index(conn, _params) do
     case get_format(conn) do
       "json" ->
         posts_dir = Application.app_dir(:ember, "priv/posts")

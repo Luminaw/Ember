@@ -1,19 +1,101 @@
-@import "@unocss/reset/tailwind.css";
-@unocss all;
-
 :root {
-  --color-primary: #2196f3;
-  --color-secondary: #64b5f6;
-  --color-accent: #82b1ff;
-  --color-text: #ffffff;
-  --color-text-muted: #b0bec5;
-  --color-background: #121212;
-  --color-surface: #1e1e1e;
-  --color-border: #2c2c2c;
+  /* Colors */
+  --color-primary: #2196f3;    /* Blue */
+  --color-secondary: #64b5f6;  /* Lighter blue */
+  --color-accent: #82b1ff;     /* Very light blue */
+  --color-text: #ffffff;       /* White text */
+  --color-text-muted: #b0bec5; /* Muted text */
+  --color-background: #121212; /* Dark background */
+  --color-surface: #1e1e1e;    /* Slightly lighter dark */
+  --color-border: #2c2c2c;     /* Dark border */
+
+  /* Typography */
+  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-base: 16px;
 }
 
-/* Only keep custom styles that can't be handled by UnoCSS */
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  background-color: var(--color-background);
+  font-family: var(--font-main);
+  font-size: var(--font-size-base);
   color: var(--color-text);
+  background-color: var(--color-background);
+  line-height: 1.5;
+}
+
+/* Layout */
+.container {
+  width: 100%;
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.main-content {
+  padding: 2rem 1rem;
+}
+
+/* Utilities */
+.text-center { text-align: center; }
+.mt-1 { margin-top: 1rem; }
+.mb-1 { margin-bottom: 1rem; }
+
+/* Elements */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button, 
+.button {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover,
+.button:hover {
+  background-color: var(--color-secondary);
+}
+
+/* Cards and Sections */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Form Elements */
+input, 
+textarea, 
+select {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+input:focus, 
+textarea:focus, 
+select:focus {
+  outline: 2px solid var(--color-primary);
+  border-color: var(--color-primary);
 }

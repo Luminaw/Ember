@@ -15,8 +15,8 @@ config :ember, EmberWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "BDlrmcBHKt3FJhPZB7ki6q+sE/hPYkL2kd12yVyunXugEQ2/PIzeJKrRDh5K/kEK",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:ember, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:ember, ~w(--watch)]}
+    # Use only esbuild watcher
+    esbuild: {Esbuild, :install_and_run, [:default, ["--sourcemap=inline"]]}
   ]
 
 # ## SSL Support
@@ -46,7 +46,7 @@ config :ember, EmberWeb.Endpoint,
 config :ember, EmberWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/ember_web/(controllers|live|components)/.*(ex|heex)$"
     ]

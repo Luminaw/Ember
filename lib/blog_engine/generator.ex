@@ -83,7 +83,7 @@ defmodule Ember.Generator do
     try do
       {:ok, Earmark.as_html!(content)}
     rescue
-      e in EarmarkParser.Error ->
+      e in Earmark.Error ->
         {:error, Error.new("Markdown parsing error: #{Exception.message(e)}", :markdown_syntax, filepath)}
     end
   end
