@@ -16,29 +16,35 @@ defmodule EmberWeb.BlogLive.Show do
 
   def render(assigns) do
     ~H"""
-    <article class="max-w-4xl mx-auto py-8">
-      <div class="mb-8">
-        <.link href={~p"/"} class="text-blue-600 hover:text-blue-800">← Back to all posts</.link>
-      </div>
+    <div class="container">
+      <article class="blog-container">
+        <h1 class="blog-title"><%= @post.title %></h1>
 
-      <h1 class="text-4xl font-bold mb-4"><%= @post.title %></h1>
-
-      <div class="text-gray-600 mb-8">
-        <%= Calendar.strftime(@post.date, "%B %d, %Y") %>
-        <%= if @post.tags != [] do %>
-          •
-          <%= for tag <- @post.tags do %>
-            <span class="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">
-              #<%= tag %>
-            </span>
+        <div class="blog-meta">
+          <%= Calendar.strftime(@post.date, "%B %d, %Y") %>
+          <%= if @post.tags != [] do %>
+            •
+            <%= for tag <- @post.tags do %>
+              <span class="tag">
+                #<%= tag %>
+              </span>
+            <% end %>
           <% end %>
-        <% end %>
-      </div>
+        </div>
 
-      <div class="prose prose-lg max-w-none">
-        <%= raw Earmark.as_html!(@post.content) %>
-      </div>
-    </article>
+        <div class="blog-content">
+          <%= raw Earmark.as_html!(@post.content) %>
+        </div>
+
+        <div class="mt-1">
+          <button class="button" phx-click="navigate" phx-value-to="/">← Back to posts</button>
+        </div>
+      </article>
+    </div>
     """
+  end
+
+  def handle_event("navigate", %{"to" => to}, socket) do
+    {:noreply, push_navigate(socket, to: to)}
   end
 end
