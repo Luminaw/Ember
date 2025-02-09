@@ -19,8 +19,15 @@ defmodule Ember.Generator do
     end
   end
 
-  def render_markdown(filepath, template_path \\ "../../templates/index.html") do
-    render_content(filepath, template_path)
+  def render_markdown(filepath) do
+    posts_dir = Application.app_dir(:ember, "priv/posts")
+    full_path = Path.join(posts_dir, filepath)
+
+    with {:ok, content} <- read_file(full_path),
+         {:ok, processed_content} <- process_eex(content, full_path),
+         {:ok, html_content} <- markdown_to_html(processed_content, full_path) do
+      {:ok, html_content}
+    end
   end
 
   defp render_content(filepath, template_path) do

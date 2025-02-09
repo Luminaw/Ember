@@ -17,7 +17,8 @@ defmodule EmberWeb.Router do
   scope "/", EmberWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    get "/", BlogController, :index
+    get "/blog/:page", BlogController, :show
   end
 
   # Other scopes may use custom stacks.
