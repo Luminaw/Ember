@@ -17,7 +17,7 @@ defmodule EmberWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import EmberWeb.Gettext
+  use Gettext, backend: EmberWeb.Gettext
 
   @doc """
   Renders a modal.
