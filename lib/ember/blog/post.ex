@@ -10,6 +10,11 @@ defmodule Ember.Blog.Post do
     |> Enum.sort_by(& &1.date, {:desc, Date})
   end
 
+  def get_post_by_slug(slug) do
+    all_posts()
+    |> Enum.find(&(&1.slug == slug))
+  end
+
   defp parse_file(file_path) do
     file_path
     |> File.read!()

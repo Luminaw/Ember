@@ -18,6 +18,7 @@ defmodule EmberWeb.Router do
     pipe_through :browser
 
     live "/", BlogLive.Index
+    live "/:slug", BlogLive.Show
     get "/blog/:page", BlogController, :show
   end
 

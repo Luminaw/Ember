@@ -15,7 +15,9 @@ defmodule EmberWeb.BlogLive.Index do
         <%= for post <- @posts do %>
           <article class="border-b border-gray-200 pb-8">
             <h2 class="text-2xl font-semibold mb-2">
-              <%= post.title %>
+              <.link href={~p"/#{post.slug}"} class="hover:text-blue-600 transition-colors">
+                <%= post.title %>
+              </.link>
             </h2>
             <div class="text-gray-600 mb-4">
               <%= Calendar.strftime(post.date, "%B %d, %Y") %>
