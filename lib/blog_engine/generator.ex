@@ -20,7 +20,7 @@ defmodule Ember.Generator do
   end
 
   def render_markdown(filepath) do
-    posts_dir = Application.app_dir(:ember, "priv/posts")
+    posts_dir = Application.app_dir(:ember, "priv")
     full_path = Path.join(posts_dir, filepath)
 
     with {:ok, content} <- read_file(full_path),
