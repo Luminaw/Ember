@@ -1,13 +1,13 @@
+/* Light mode (default) */
 :root {
-    /* Colors - A more visually pleasing and readable color scheme */
-    --color-primary: #6c5ce7; /* A soft, modern purple */
-    --color-secondary: #a29bfe; /* A lighter shade for accents */
-    --color-accent: #fd79a8; /* A gentle pink for highlights */
-    --color-text: #2d3436; /* Dark charcoal for excellent readability */
-    --color-text-muted: #84817a; /* A softer gray for muted elements */
-    --color-background: #f5f6fa; /* Very light gray for a clean backdrop */
-    --color-surface: #ffffff; /* Pure white for content containers */
-    --color-border: #dcdde1; /* A subtle border color */
+    --color-primary: #6c5ce7;
+    --color-secondary: #a29bfe;
+    --color-accent: #fd79a8;
+    --color-text: #2d3436;
+    --color-text-muted: #84817a;
+    --color-background: #f5f6fa;
+    --color-surface: #ffffff;
+    --color-border: #dcdde1;
 
     /* Typography */
     --font-main: "Segoe UI", Roboto, "Open Sans", sans-serif;
@@ -19,6 +19,20 @@
     --font-size-h2: 2.4rem;
     --font-size-h3: 1.9rem;
     --line-height-blog: 1.85;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-primary: #a29bfe;
+        --color-secondary: #6c5ce7;
+        --color-accent: #fd79a8;
+        --color-text: #e2e8f0;
+        --color-text-muted: #a0aec0;
+        --color-background: #1a202c;
+        --color-surface: #2d3748;
+        --color-border: #4a5568;
+    }
 }
 
 /* Reset */
