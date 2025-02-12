@@ -16,5 +16,10 @@ config :swoosh, local: false
 # Do not print debug messages in production
 config :logger, level: :info
 
+# Ensure https is always used
+config :ember, EmberWeb.Endpoint,
+  force_ssl: [hsts: true, rewrite_on: [:x_forwarded_proto]],
+  check_origin: true
+
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.

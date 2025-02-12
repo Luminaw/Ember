@@ -27,6 +27,11 @@
     <meta name="twitter:title" content={assigns[:page_title] || "My Blog"} />
     <meta name="twitter:description" content={assigns[:meta_description] || "A fast static site generator written in Elixir"} />
     <meta name="twitter:image" content={url(~p"/images/og-image.jpg")} />
+
+    <!-- Cache -->
+    <meta http-equiv="cache-control" content="public" />
+    <meta http-equiv="expires" content="86400" />
+
     <.live_title suffix=" · Ember">
       <%= assigns[:page_title] || "My Blog" %>
     </.live_title>
