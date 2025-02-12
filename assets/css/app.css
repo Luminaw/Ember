@@ -65,6 +65,14 @@ body {
     text-rendering: optimizeLegibility; /* Improve text rendering */
 }
 
+
+/* Keyframes */
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+}
+
 /* Layout */
 .container {
     width: 100%;
@@ -286,8 +294,6 @@ select:focus {
     color: var(--color-text);
 }
 
-/* TODO: fix this so that error messages are not stuck in the top right */
-
 .flash {
     position: fixed;
     top: 1.5rem;
@@ -300,6 +306,7 @@ select:focus {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
     transition: all 0.3s ease;
     overflow: hidden;
+    animation: fadeOut 20s forwards;
 }
 
 .flash[data-type="info"] {
