@@ -22,8 +22,18 @@ defmodule EmberWeb.Endpoint do
   plug Plug.Static,
     at: "/",
     from: :ember,
-    gzip: false,
-    only: EmberWeb.static_paths()
+    gzip: true,
+    only: EmberWeb.static_paths(),
+    headers: [
+      {"cache-control", "public, max-age=31536000, immutable"},
+      {"vary", "Accept-Encoding"},
+      {"x-content-type-options", "nosniff"},
+      {"x-frame-options", "SAMEORIGIN"},
+      {"x-xss-protection", "1; mode=block"},
+      {"strict-transport-security", "max-age=31536000; includeSubDomains"},
+      {"permissions-policy", "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"},
+      {"referrer-policy", "strict-origin-when-cross-origin"}
+    ]
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

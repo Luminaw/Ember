@@ -4,12 +4,42 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title suffix=" · Phoenix Framework">
-      <%= assigns[:page_title] || "Ember" %>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content={assigns[:meta_description] || "A fast static site generator written in Elixir"} />
+    <meta name="keywords" content={assigns[:meta_keywords] || "elixir, static site generator, blog, phoenix framework"} />
+    <meta name="author" content={assigns[:author_name] || "Your Name"} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={url(~p"/")} />
+    <meta property="og:title" content={assigns[:page_title] || "My Blog"} />
+    <meta property="og:description" content={assigns[:meta_description] || "A fast static site generator written in Elixir"} />
+    <meta property="og:image" content={url(~p"/images/og-image.jpg")} />
+    <meta property="og:site_name" content={assigns[:page_title] || "My Blog"} />
+    <meta property="og:locale" content={assigns[:meta_lang] || "en_US"} />
+    <meta property="og:robots" content="index, follow" />
+    <meta property="og:twitter" content={assigns[:twitter_handle] || "@yourhandle"} />
+    <meta property="og:creator" content={assigns[:author_name] || "Your Name"} />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={url(~p"/")} />
+    <meta name="twitter:title" content={assigns[:page_title] || "My Blog"} />
+    <meta name="twitter:description" content={assigns[:meta_description] || "A fast static site generator written in Elixir"} />
+    <meta name="twitter:image" content={url(~p"/images/og-image.jpg")} />
+
+    <!-- Cache -->
+    <meta http-equiv="cache-control" content="public" />
+    <meta http-equiv="expires" content="86400" />
+
+    <.live_title suffix=" · Ember">
+      <%= assigns[:page_title] || "My Blog" %>
     </.live_title>
+    <link rel="canonical" href={url(~p"/")} />
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
+    <link rel="icon" type="image/x-icon" href={~p"/favicon.ico"} />
   </head>
   <body class="bg-white">
     <%= @inner_content %>
