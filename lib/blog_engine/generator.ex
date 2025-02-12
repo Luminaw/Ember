@@ -53,10 +53,18 @@ defmodule Ember.Generator do
   end
 
   defp read_file(path) do
-    case File.read(path) do
-      {:ok, content} -> {:ok, content}
+    max_size = 5_000_000  # 5 MB
+    case File.stat(path) do
+      {:ok, %{size: size}} when size > max_size ->
+        {:error, Error.new("File size too large", :file_size, path)}
+      {:ok, _ } ->
+        case File.read(path) do
+          {:ok, content} -> {:ok, content}
+          {:error, reason} ->
+            {:error, Error.new("Failed to read file", reason, path)}
+        end
       {:error, reason} ->
-        {:error, Error.new("Failed to read file", reason, path)}
+        {:error, Error.new("Failed to check file size", reason, path)}
     end
   end
 
@@ -70,18 +78,30 @@ defmodule Ember.Generator do
     end
   end
 
-  defp process_eex(content, filepath) do
-    try do
-      {:ok, EEx.eval_string(content)}
-    rescue
-      e in EEx.SyntaxError ->
-        {:error, Error.new("EEx syntax error: #{Exception.message(e)}", :eex_syntax, filepath)}
+    defp process_eex(content, filepath) do
+    task = Task.async(fn ->
+      try do
+        {:ok, EEx.eval_string(content)}
+      rescue
+        e in EEx.SyntaxError ->
+          {:error, Error.new("EEx syntax error: #{Exception.message(e)}", :eex_syntax, filepath)}
+      end
+    end)
+
+    case Task.yield(task, 5000) || Task.shutdown(task) do
+      {:ok, result} -> result
+      nil -> {:error, Error.new("EEx evaluation timeout", :timeout, filepath)}
     end
   end
 
   defp markdown_to_html(content, filepath) do
     try do
-      {:ok, Earmark.as_html!(content)}
+      {
+        :ok,
+        content
+        |> Earmark.as_html!()
+        |> sanitize()
+      }
     rescue
       e in Earmark.Error ->
         {:error, Error.new("Markdown parsing error: #{Exception.message(e)}", :markdown_syntax, filepath)}
@@ -95,4 +115,10 @@ defmodule Ember.Generator do
         {:error, Error.new("Failed to create directory", reason, dir)}
     end
   end
+
+  def sanitize(html) when is_binary(html) do
+    HtmlSanitizeEx.basic_html(html)
+  end
+
+  def sanitize(nil), do: nil
 end
