@@ -32,6 +32,8 @@
     <meta http-equiv="cache-control" content="public" />
     <meta http-equiv="expires" content="86400" />
 
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https:;">
+
     <.live_title suffix=" · Ember">
       <%= assigns[:page_title] || "My Blog" %>
     </.live_title>
