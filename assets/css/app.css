@@ -9,12 +9,12 @@
     --color-surface: #ffffff;
     --color-border: #dcdde1;
     
-    --color-info-bg: #f0f9ff;
-    --color-info-border: #bae6fd;
-    --color-info-text: #0369a1;
-    --color-error-bg: #fef2f2;
-    --color-error-border: #fecaca;
-    --color-error-text: #991b1b;
+    --color-info-bg: #f5f3ff;
+    --color-info-border: #a29bfe;
+    --color-info-text: #5a45ed;
+    --color-error-bg: #fdf2f8;
+    --color-error-border: #fd79a8;
+    --color-error-text: #db2777;
 
     /* Typography */
     --font-main: "Segoe UI", Roboto, "Open Sans", sans-serif;
@@ -40,12 +40,12 @@
         --color-surface: #2d3748;
         --color-border: #4a5568;
 
-        --color-info-bg: #082f49;
-        --color-info-border: #0369a1;
-        --color-info-text: #bae6fd;
-        --color-error-bg: #450a0a;
-        --color-error-border: #991b1b;
-        --color-error-text: #fecaca;
+        --color-info-bg: #2e1065;
+        --color-info-border: #a29bfe;
+        --color-info-text: #c4b5fd;
+        --color-error-bg: #31091f;
+        --color-error-border: #fd79a8;
+        --color-error-text: #fbcfe8;
     }
 }
 
