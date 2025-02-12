@@ -6,8 +6,8 @@
     <meta name="csrf-token" content={get_csrf_token()} />
     <!-- SEO Meta Tags -->
     <meta name="description" content={assigns[:meta_description] || "A fast static site generator written in Elixir"} />
-    <meta name="keywords" content="elixir, static site generator, blog, phoenix framework" />
-    <meta name="author" content="Your Name" />
+    <meta name="keywords" content={assigns[:meta_keywords] || "elixir, static site generator, blog, phoenix framework"} />
+    <meta name="author" content={assigns[:author_name] || "Your Name"} />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -15,7 +15,12 @@
     <meta property="og:title" content={assigns[:page_title] || "My Blog"} />
     <meta property="og:description" content={assigns[:meta_description] || "A fast static site generator written in Elixir"} />
     <meta property="og:image" content={url(~p"/images/og-image.jpg")} />
-
+    <meta property="og:site_name" content={assigns[:page_title] || "My Blog"} />
+    <meta property="og:locale" content={assigns[:meta_lang] || "en_US"} />
+    <meta property="og:robots" content="index, follow" />
+    <meta property="og:twitter" content={assigns[:twitter_handle] || "@yourhandle"} />
+    <meta property="og:creator" content={assigns[:author_name] || "Your Name"} />
+    
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content={url(~p"/")} />
