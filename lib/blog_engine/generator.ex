@@ -70,12 +70,19 @@ defmodule Ember.Generator do
     end
   end
 
-  defp process_eex(content, filepath) do
-    try do
-      {:ok, EEx.eval_string(content)}
-    rescue
-      e in EEx.SyntaxError ->
-        {:error, Error.new("EEx syntax error: #{Exception.message(e)}", :eex_syntax, filepath)}
+    defp process_eex(content, filepath) do
+    task = Task.async(fn ->
+      try do
+        {:ok, EEx.eval_string(content)}
+      rescue
+        e in EEx.SyntaxError ->
+          {:error, Error.new("EEx syntax error: #{Exception.message(e)}", :eex_syntax, filepath)}
+      end
+    end)
+
+    case Task.yield(task, 5000) || Task.shutdown(task) do
+      {:ok, result} -> result
+      nil -> {:error, Error.new("EEx evaluation timeout", :timeout, filepath)}
     end
   end
 
