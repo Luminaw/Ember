@@ -46,10 +46,8 @@ defmodule Ember.Blog.Post do
   end
 
   defp split_frontmatter(content) do
-    IO.puts("Content starts with: #{String.slice(content, 0..10)}")
     content = String.replace(content, "\r\n", "\n")
     parts = String.split(content, ~r/^---\s*$/m, parts: 3)
-    IO.inspect(parts, label: "Split parts")
 
     case parts do
       ["", frontmatter, content] -> {frontmatter, content}
