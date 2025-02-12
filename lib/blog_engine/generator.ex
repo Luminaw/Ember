@@ -53,10 +53,18 @@ defmodule Ember.Generator do
   end
 
   defp read_file(path) do
-    case File.read(path) do
-      {:ok, content} -> {:ok, content}
+    max_size = 5_000_000  # 5 MB
+    case File.stat(path) do
+      {:ok, %{size: size}} when size > max_size ->
+        {:error, Error.new("File size too large", :file_size, path)}
+      {:ok, _ } ->
+        case File.read(path) do
+          {:ok, content} -> {:ok, content}
+          {:error, reason} ->
+            {:error, Error.new("Failed to read file", reason, path)}
+        end
       {:error, reason} ->
-        {:error, Error.new("Failed to read file", reason, path)}
+        {:error, Error.new("Failed to check file size", reason, path)}
     end
   end
 
