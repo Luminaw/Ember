@@ -81,7 +81,12 @@ defmodule Ember.Generator do
 
   defp markdown_to_html(content, filepath) do
     try do
-      {:ok, Earmark.as_html!(content)}
+      {
+        :ok,
+        content
+        |> Earmark.as_html!()
+        |> sanitize()
+      }
     rescue
       e in Earmark.Error ->
         {:error, Error.new("Markdown parsing error: #{Exception.message(e)}", :markdown_syntax, filepath)}
@@ -95,4 +100,10 @@ defmodule Ember.Generator do
         {:error, Error.new("Failed to create directory", reason, dir)}
     end
   end
+
+  def sanitize(html) when is_binary(html) do
+    HtmlSanitizeEx.basic_html(html)
+  end
+
+  def sanitize(nil), do: nil
 end
