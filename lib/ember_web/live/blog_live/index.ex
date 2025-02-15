@@ -3,11 +3,12 @@ defmodule EmberWeb.BlogLive.Index do
   alias Ember.Blog.{Post, Tag}
 
   def mount(%{"tag" => tag}, _session, socket) do
+    sanitized_tag = sanitize_tag(tag)
     {:ok,
      socket
-     |> assign(:posts, Tag.posts_with_tag(tag))
+     |> assign(:posts, Tag.posts_with_tag(sanitized_tag))
      |> assign(:tags, Tag.list_tags())
-     |> assign(:selected_tag, tag)}
+     |> assign(:selected_tag, sanitized_tag)}
   end
 
   def mount(_params, _session, socket) do
@@ -19,10 +20,11 @@ defmodule EmberWeb.BlogLive.Index do
   end
 
   def handle_event("filter-tag", %{"tag" => tag}, socket) do
+    sanitized_tag = sanitize_tag(tag)
     {:noreply,
      socket
-     |> assign(:selected_tag, tag)
-     |> assign(:posts, Tag.posts_with_tag(tag))}
+     |> assign(:selected_tag, sanitized_tag)
+     |> assign(:posts, Tag.posts_with_tag(sanitized_tag))}
   end
 
   def handle_event("clear-filter", _, socket) do
@@ -88,4 +90,13 @@ defmodule EmberWeb.BlogLive.Index do
     </div>
     """
   end
+
+  defp sanitize_tag(tag) when is_binary(tag) do
+    tag
+    |> String.trim()
+    |> HtmlSanitizeEx.strip_tags()
+    |> String.replace(~r/[^\w\s-]/, "")  # Only allow letters, numbers, spaces, and hyphens
+    |> String.slice(0, 50)  # Limit tag length
+  end
+  defp sanitize_tag(_), do: nil
 end
