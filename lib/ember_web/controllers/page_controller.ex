@@ -1,9 +1,10 @@
 defmodule EmberWeb.PageController do
   use EmberWeb, :controller
+  alias Ember.Generator
 
   def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout.
-    render(conn, :home, layout: false)
+    posts = Generator.list_published_posts("priv/posts")
+    |> Enum.map(&String.replace(&1, ".md", ""))
+    render(conn, :home, posts: posts)
   end
 end

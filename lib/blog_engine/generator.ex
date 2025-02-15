@@ -68,9 +68,18 @@ defmodule Ember.Generator do
     end
   end
 
+  def is_post_published?(filepath) do
+    case get_post_datetime(filepath) do
+      {:ok, post_datetime} ->
+        DateTime.compare(post_datetime, DateTime.utc_now()) in [:lt, :eq]
+      _ -> false
+    end
+  end
+
   def render_markdown(filepath) do
     posts_dir = Application.app_dir(:ember, "priv")
     with {:ok, safe_path} <- ensure_safe_path(posts_dir, filepath),
+         true <- is_post_published?(safe_path) || {:error, :not_published},
          {:ok, content} <- read_file(safe_path),
          {:ok, processed_content} <- process_eex(content, safe_path),
          {:ok, html_content} <- markdown_to_html(processed_content, safe_path) do
@@ -79,10 +88,24 @@ defmodule Ember.Generator do
   end
 
   defp render_content(filepath, template) do  # Modified to accept template
-    with {:ok, content} <- read_file(filepath),
+    with true <- is_post_published?(filepath) || {:error, :not_published},
+         {:ok, content} <- read_file(filepath),
          {:ok, processed_content} <- process_eex(content, filepath),
          {:ok, html_content} <- markdown_to_html(processed_content, filepath) do
       {:ok, String.replace(template, "<div id=\"content\"></div>", html_content)}
+    end
+  end
+
+  def list_published_posts(content_dir) do
+    with {:ok, abs_content_dir} <- ensure_safe_path(File.cwd!(), content_dir) do
+      current_datetime = DateTime.utc_now()
+
+      File.ls!(abs_content_dir)
+      |> Enum.filter(&String.ends_with?(&1, ".md"))
+      |> Enum.filter(fn filename ->
+        filepath = Path.join(abs_content_dir, filename)
+        is_post_published?(filepath)
+      end)
     end
   end
 
@@ -146,8 +169,8 @@ defmodule Ember.Generator do
     case File.mkdir_p(dir) do
       :ok -> :ok
       {:error, reason} ->
-        {:error, Error.new("Failed to create directory", reason, dir)}
-    end
+{:error, Error.new("Failed to create directory", reason, dir)}
+end
   end
 
   def sanitize(html) when is_binary(html) do

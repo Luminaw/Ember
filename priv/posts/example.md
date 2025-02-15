@@ -1,7 +1,7 @@
 ---
 title: My Post
 description: An example post with date and time
-date: 2025-02-14
+date: 2025-02-16
 time: "23:00:00"
 tags:
   - example
