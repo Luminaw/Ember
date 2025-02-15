@@ -1,5 +1,6 @@
 defmodule Ember.Generator do
   alias Ember.Generator.Error
+  require Logger
 
   # Add this function to sanitize paths
   defp ensure_safe_path(base_dir, path) do
@@ -14,11 +15,19 @@ defmodule Ember.Generator do
   def generate_blog(content_dir, output_dir, template_path \\ "../../templates/index.html") do
     with :ok <- ensure_directory(output_dir),
          {:ok, abs_content_dir} <- ensure_safe_path(File.cwd!(), content_dir),
-         {:ok, template} <- read_template(template_path) do  # Read template once
+         {:ok, template} <- read_template(template_path) do
+
+      current_datetime = DateTime.utc_now()
 
       File.ls!(abs_content_dir)
       |> Enum.filter(&String.ends_with?(&1, ".md"))
-      |> Task.async_stream(fn filename ->  # Parallel processing
+      |> Enum.filter(fn filename ->
+        case get_post_datetime(Path.join(abs_content_dir, filename)) do
+          {:ok, post_datetime} -> DateTime.compare(post_datetime, current_datetime) in [:lt, :eq]
+          _ -> false
+        end
+      end)
+      |> Task.async_stream(fn filename ->
         safe_filename = Path.basename(filename)
         filepath = Path.join(abs_content_dir, safe_filename)
         with {:ok, html} <- render_content(filepath, template),  # Pass template instead of path
@@ -31,6 +40,31 @@ defmodule Ember.Generator do
         end
       end, max_concurrency: 4)  # Limit concurrent tasks
       |> Enum.to_list()
+    end
+  end
+
+  defp get_post_datetime(filepath) do
+    with {:ok, content} <- read_file(filepath),
+         [frontmatter | _] <- String.split(content, "---\n", parts: 3),
+         {:ok, parsed} <- YamlElixir.read_from_string(frontmatter),
+         %{"date" => date_string} = parsed do
+
+      # Handle different time formats
+      time_string = Map.get(parsed, "time", "00:00:00")
+      datetime_string = "#{date_string}T#{time_string}Z"
+      Logger.debug("Parsed datetime: #{datetime_string}")
+
+      case DateTime.from_iso8601(datetime_string) do
+        {:ok, datetime, _offset} -> {:ok, datetime}
+        _error ->
+          # Fallback to midnight if only date is provided
+          case Date.from_iso8601(date_string) do
+            {:ok, date} -> {:ok, DateTime.new!(date, ~T[00:00:00], "Etc/UTC")}
+            _error -> {:error, :invalid_datetime}
+          end
+      end
+    else
+      _ -> {:error, :invalid_datetime}
     end
   end
 
