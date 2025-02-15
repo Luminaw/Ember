@@ -36,7 +36,7 @@ Visit `http://localhost:4000` to view your site.
 
 - [ ] RSS feed support
 - [ ] Sort by tags
-- [ ] Delay access to posts until date
+- [x] Delay access to posts until date
 - [ ] Ability to update on webhook from repo
 - [ ] Proper user configuration
 - [ ] Documentation
