@@ -15,7 +15,7 @@ defmodule Ember.Generator do
   def generate_blog(content_dir, output_dir, template_path \\ "../../templates/index.html") do
     with :ok <- ensure_directory(output_dir),
          {:ok, abs_content_dir} <- ensure_safe_path(File.cwd!(), content_dir),
-         {:ok, template} <- read_template(template_path) do
+         {:ok, _template} <- read_template(template_path) do
 
       current_datetime = DateTime.utc_now()
 
@@ -30,7 +30,7 @@ defmodule Ember.Generator do
       |> Task.async_stream(fn filename ->
         safe_filename = Path.basename(filename)
         filepath = Path.join(abs_content_dir, safe_filename)
-        with {:ok, html} <- render_content(filepath, template),  # Pass template instead of path
+        with {:ok, html} <- render_content(filepath, template_path),  # Pass template instead of path
              output_filename = String.replace(filename, ".md", ".html"),
              output_path = Path.join(output_dir, output_filename),
              :ok <- File.write(output_path, html) do
@@ -87,8 +87,9 @@ defmodule Ember.Generator do
     end
   end
 
-  defp render_content(filepath, template) do  # Modified to accept template
-    with true <- is_post_published?(filepath) || {:error, :not_published},
+  def render_content(filepath, template_path) do  # Modified to accept template
+    with {:ok, template} <- read_template(template_path),
+         true <- is_post_published?(filepath) || {:error, :not_published},
          {:ok, content} <- read_file(filepath),
          {:ok, processed_content} <- process_eex(content, filepath),
          {:ok, html_content} <- markdown_to_html(processed_content, filepath) do
@@ -98,8 +99,6 @@ defmodule Ember.Generator do
 
   def list_published_posts(content_dir) do
     with {:ok, abs_content_dir} <- ensure_safe_path(File.cwd!(), content_dir) do
-      current_datetime = DateTime.utc_now()
-
       File.ls!(abs_content_dir)
       |> Enum.filter(&String.ends_with?(&1, ".md"))
       |> Enum.filter(fn filename ->

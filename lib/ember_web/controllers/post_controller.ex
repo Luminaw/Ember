@@ -4,7 +4,7 @@ defmodule EmberWeb.PostController do
 
   def show(conn, %{"id" => post_id}) do
     post_path = Path.join(["priv", "posts", "#{post_id}.md"])
-    template_path = "../../templates/post.html"
+    template_path = Path.join([Application.app_dir(:ember), "priv", "templates", "post.html"])
 
     case Generator.render_content(post_path, template_path) do
       {:ok, content} ->
