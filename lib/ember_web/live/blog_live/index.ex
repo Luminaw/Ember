@@ -2,6 +2,14 @@ defmodule EmberWeb.BlogLive.Index do
   use EmberWeb, :live_view
   alias Ember.Blog.{Post, Tag}
 
+  def mount(%{"tag" => tag}, _session, socket) do
+    {:ok,
+     socket
+     |> assign(:posts, Tag.posts_with_tag(tag))
+     |> assign(:tags, Tag.list_tags())
+     |> assign(:selected_tag, tag)}
+  end
+
   def mount(_params, _session, socket) do
     {:ok,
      socket
