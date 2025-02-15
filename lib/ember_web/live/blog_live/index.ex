@@ -1,15 +1,50 @@
 defmodule EmberWeb.BlogLive.Index do
   use EmberWeb, :live_view
-  alias Ember.Blog.Post
+  alias Ember.Blog.{Post, Tag}
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :posts, Post.all_posts())}
+    {:ok,
+     socket
+     |> assign(:posts, Post.all_posts())
+     |> assign(:tags, Tag.list_tags())
+     |> assign(:selected_tag, nil)}
+  end
+
+  def handle_event("filter-tag", %{"tag" => tag}, socket) do
+    {:noreply,
+     socket
+     |> assign(:selected_tag, tag)
+     |> assign(:posts, Tag.posts_with_tag(tag))}
+  end
+
+  def handle_event("clear-filter", _, socket) do
+    {:noreply,
+     socket
+     |> assign(:selected_tag, nil)
+     |> assign(:posts, Post.all_posts())}
   end
 
   def render(assigns) do
     ~H"""
     <div class="blog-container">
       <h1 class="blog-title">Blog Posts</h1>
+
+      <div class="tags-filter">
+        <%= for tag <- @tags do %>
+          <button
+            class={"tag-button #{if @selected_tag == tag, do: "selected"}"}
+            phx-click="filter-tag"
+            phx-value-tag={tag}
+          >
+            #<%= tag %>
+          </button>
+        <% end %>
+        <%= if @selected_tag do %>
+          <button class="clear-filter" phx-click="clear-filter">
+            Clear filter
+          </button>
+        <% end %>
+      </div>
 
       <ul class="blog-list">
         <%= for post <- @posts do %>
