@@ -1,5 +1,6 @@
 defmodule Ember.Generator do
   alias Ember.Generator.Error
+  require Logger
 
   # Add this function to sanitize paths
   defp ensure_safe_path(base_dir, path) do
@@ -14,14 +15,22 @@ defmodule Ember.Generator do
   def generate_blog(content_dir, output_dir, template_path \\ "../../templates/index.html") do
     with :ok <- ensure_directory(output_dir),
          {:ok, abs_content_dir} <- ensure_safe_path(File.cwd!(), content_dir),
-         {:ok, template} <- read_template(template_path) do  # Read template once
+         {:ok, _template} <- read_template(template_path) do
+
+      current_datetime = DateTime.utc_now()
 
       File.ls!(abs_content_dir)
       |> Enum.filter(&String.ends_with?(&1, ".md"))
-      |> Task.async_stream(fn filename ->  # Parallel processing
+      |> Enum.filter(fn filename ->
+        case get_post_datetime(Path.join(abs_content_dir, filename)) do
+          {:ok, post_datetime} -> DateTime.compare(post_datetime, current_datetime) in [:lt, :eq]
+          _ -> false
+        end
+      end)
+      |> Task.async_stream(fn filename ->
         safe_filename = Path.basename(filename)
         filepath = Path.join(abs_content_dir, safe_filename)
-        with {:ok, html} <- render_content(filepath, template),  # Pass template instead of path
+        with {:ok, html} <- render_content(filepath, template_path),  # Pass template instead of path
              output_filename = String.replace(filename, ".md", ".html"),
              output_path = Path.join(output_dir, output_filename),
              :ok <- File.write(output_path, html) do
@@ -34,9 +43,43 @@ defmodule Ember.Generator do
     end
   end
 
+  defp get_post_datetime(filepath) do
+    with {:ok, content} <- read_file(filepath),
+         [frontmatter | _] <- String.split(content, "---\n", parts: 3),
+         {:ok, parsed} <- YamlElixir.read_from_string(frontmatter),
+         %{"date" => date_string} = parsed do
+
+      # Handle different time formats
+      time_string = Map.get(parsed, "time", "00:00:00")
+      datetime_string = "#{date_string}T#{time_string}Z"
+      Logger.debug("Parsed datetime: #{datetime_string}")
+
+      case DateTime.from_iso8601(datetime_string) do
+        {:ok, datetime, _offset} -> {:ok, datetime}
+        _error ->
+          # Fallback to midnight if only date is provided
+          case Date.from_iso8601(date_string) do
+            {:ok, date} -> {:ok, DateTime.new!(date, ~T[00:00:00], "Etc/UTC")}
+            _error -> {:error, :invalid_datetime}
+          end
+      end
+    else
+      _ -> {:error, :invalid_datetime}
+    end
+  end
+
+  def is_post_published?(filepath) do
+    case get_post_datetime(filepath) do
+      {:ok, post_datetime} ->
+        DateTime.compare(post_datetime, DateTime.utc_now()) in [:lt, :eq]
+      _ -> false
+    end
+  end
+
   def render_markdown(filepath) do
     posts_dir = Application.app_dir(:ember, "priv")
     with {:ok, safe_path} <- ensure_safe_path(posts_dir, filepath),
+         true <- is_post_published?(safe_path) || {:error, :not_published},
          {:ok, content} <- read_file(safe_path),
          {:ok, processed_content} <- process_eex(content, safe_path),
          {:ok, html_content} <- markdown_to_html(processed_content, safe_path) do
@@ -44,11 +87,24 @@ defmodule Ember.Generator do
     end
   end
 
-  defp render_content(filepath, template) do  # Modified to accept template
-    with {:ok, content} <- read_file(filepath),
+  def render_content(filepath, template_path) do  # Modified to accept template
+    with {:ok, template} <- read_template(template_path),
+         true <- is_post_published?(filepath) || {:error, :not_published},
+         {:ok, content} <- read_file(filepath),
          {:ok, processed_content} <- process_eex(content, filepath),
          {:ok, html_content} <- markdown_to_html(processed_content, filepath) do
       {:ok, String.replace(template, "<div id=\"content\"></div>", html_content)}
+    end
+  end
+
+  def list_published_posts(content_dir) do
+    with {:ok, abs_content_dir} <- ensure_safe_path(File.cwd!(), content_dir) do
+      File.ls!(abs_content_dir)
+      |> Enum.filter(&String.ends_with?(&1, ".md"))
+      |> Enum.filter(fn filename ->
+        filepath = Path.join(abs_content_dir, filename)
+        is_post_published?(filepath)
+      end)
     end
   end
 
@@ -112,8 +168,8 @@ defmodule Ember.Generator do
     case File.mkdir_p(dir) do
       :ok -> :ok
       {:error, reason} ->
-        {:error, Error.new("Failed to create directory", reason, dir)}
-    end
+{:error, Error.new("Failed to create directory", reason, dir)}
+end
   end
 
   def sanitize(html) when is_binary(html) do
