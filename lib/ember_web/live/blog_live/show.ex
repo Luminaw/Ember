@@ -25,9 +25,9 @@ defmodule EmberWeb.BlogLive.Show do
           <%= if @post.tags != [] do %>
             •
             <%= for tag <- @post.tags do %>
-              <span class="tag">
+              <button class="tag-button" phx-click="filter-tag" phx-value-tag={tag}>
                 #<%= tag %>
-              </span>
+              </button>
             <% end %>
           <% end %>
         </div>
@@ -46,5 +46,9 @@ defmodule EmberWeb.BlogLive.Show do
 
   def handle_event("navigate", %{"to" => to}, socket) do
     {:noreply, push_navigate(socket, to: to)}
+  end
+
+  def handle_event("filter-tag", %{"tag" => tag}, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/?tag=#{tag}")}
   end
 end

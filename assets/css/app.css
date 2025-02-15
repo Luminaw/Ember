@@ -303,6 +303,62 @@ select:focus {
     color: var(--color-text);
 }
 
+/* Tags Filter */
+.tags-filter {
+    margin: 1.8rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.tag-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.9rem;
+    border-radius: 1.3rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.tag-button:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.tag-button.selected {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-surface);
+}
+
+.tag-button.selected:hover {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+}
+
+.clear-filter {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.9rem;
+    border-radius: 1.3rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.clear-filter:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+/* Flash popup banners */
 .flash {
     position: fixed;
     top: 0.5rem;
