@@ -41,6 +41,7 @@ Visit `http://localhost:4000` to view your site.
 - [ ] Proper user configuration
 - [ ] Documentation
 - [ ] Full server side Caching
+- [ ] Full CI/CD and testing
 - [ ] Codeblocks syntax highlighting
 
 ## Development
