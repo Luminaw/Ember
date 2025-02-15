@@ -8,3 +8,7 @@ tags:
   - than
   - this
 ---
+
+# Dummy Post
+
+Just some content for a post with more tags

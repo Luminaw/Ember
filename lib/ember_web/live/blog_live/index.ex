@@ -70,7 +70,13 @@ defmodule EmberWeb.BlogLive.Index do
             </div>
             <div class="blog-tags">
               <%= for tag <- post.tags do %>
-                <span class="tag"><%= tag %></span>
+                <button
+                  class={"tag-button #{if @selected_tag == tag, do: "selected"}"}
+                  phx-click="filter-tag"
+                  phx-value-tag={tag}
+                >
+                  #<%= tag %>
+                </button>
               <% end %>
             </div>
             <.link navigate={~p"/#{post.slug}"} class="read-more">
